@@ -1,0 +1,152 @@
+import java.util.*;
+
+// Base Class
+class Account {
+    protected int accountNumber;
+    protected double balance;
+
+    public Account(int accountNumber, double balance) {
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
+        System.out.println("Deposited: " + amount);
+    }
+
+    public void withdraw(double amount) {
+        if (amount <= balance) {
+            balance -= amount;
+            System.out.println("Withdrawn: " + amount);
+        } else {
+            System.out.println("Insufficient balance!");
+        }
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public int getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void display() {
+        System.out.println("Account No: " + accountNumber + ", Balance: " + balance);
+    }
+}
+
+// SavingsAccount Class
+class SavingsAccount extends Account {
+    private double minimumBalance = 1000;
+
+    public SavingsAccount(int accNo, double balance) {
+        super(accNo, balance);
+    }
+
+    @Override
+    public void withdraw(double amount) {
+        if (balance - amount >= minimumBalance) {
+            balance -= amount;
+            System.out.println("Savings Withdrawn: " + amount);
+        } else {
+            System.out.println("Cannot withdraw. Minimum balance required: " + minimumBalance);
+        }
+    }
+}
+
+// LoanAccount Class
+class LoanAccount extends Account {
+
+    public LoanAccount(int accNo, double loanAmount) {
+        super(accNo, loanAmount);
+    }
+
+    // Deposit = repay loan
+    @Override
+    public void deposit(double amount) {
+        balance -= amount;
+        System.out.println("Loan repaid: " + amount);
+    }
+
+    // Withdraw = take more loan
+    @Override
+    public void withdraw(double amount) {
+        balance += amount;
+        System.out.println("Loan taken: " + amount);
+    }
+
+    @Override
+    public void display() {
+        System.out.println("Loan Account No: " + accountNumber + ", Loan Balance: " + balance);
+    }
+}
+
+// Customer Class
+class Customer {
+    private int customerId;
+    private String name;
+    private List<Account> accounts;
+
+    public Customer(int id, String name) {
+        this.customerId = id;
+        this.name = name;
+        this.accounts = new ArrayList<>();
+    }
+
+    public void addAccount(Account acc) {
+        accounts.add(acc);
+    }
+
+    public void displayCustomerDetails() {
+        System.out.println("\nCustomer ID: " + customerId + ", Name: " + name);
+        System.out.println("Accounts:");
+        for (Account acc : accounts) {
+            acc.display();
+        }
+    }
+}
+
+// Main Class
+public class BankingApp {
+    public static void main(String[] args) {
+
+        ArrayList<Customer> customers = new ArrayList<>();
+
+        // Create Customers
+        Customer c1 = new Customer(1, "Alice");
+        Customer c2 = new Customer(2, "Bob");
+
+        // Create Accounts
+        Account s1 = new SavingsAccount(101, 5000);
+        Account l1 = new LoanAccount(201, 10000);
+
+        Account s2 = new SavingsAccount(102, 3000);
+        Account l2 = new LoanAccount(202, 20000);
+
+        // Assign accounts to customers
+        c1.addAccount(s1);
+        c1.addAccount(l1);
+
+        c2.addAccount(s2);
+        c2.addAccount(l2);
+
+        // Add customers to list
+        customers.add(c1);
+        customers.add(c2);
+
+        // Perform some operations
+        s1.deposit(1000);
+        s1.withdraw(2000);
+
+        l1.deposit(3000);
+        l1.withdraw(2000);
+
+        // Display consolidated information
+        System.out.println("\n--- Customer Account Summary ---");
+        for (Customer c : customers) {
+            c.displayCustomerDetails();
+        }
+    }
+}
