@@ -1,0 +1,100 @@
+// Abstract root class
+abstract class Employee {
+String name;
+String PANNo;
+String joiningDate;
+String designation;
+int empId;
+Employee(String name, String PANNo, String joiningDate, String designation, int empId) {
+this.name = name;
+this.PANNo = PANNo;
+this.joiningDate = joiningDate;
+this.designation = designation;
+this.empId = empId;
+}
+// Abstract method
+abstract double calcCTC();
+void display() {
+System.out.println("Employee ID: " + empId);
+System.out.println("Name: " + name);
+System.out.println("Designation: " + designation);
+System.out.println("PAN No: " + PANNo);
+System.out.println("Joining Date: " + joiningDate);
+}
+}
+// Child class (Hierarchical inheritance)
+class FullTimeEmployee extends Employee {
+double baseSalary;
+double perfBonus;
+String role;
+FullTimeEmployee(String name, String PANNo, String joiningDate, String designation,
+int empId, String role, double baseSalary, double perfBonus) {
+super(name, PANNo, joiningDate, designation, empId);
+this.role = role;
+this.baseSalary = baseSalary;
+this.perfBonus = perfBonus;
+}
+@Override
+double calcCTC() {
+if(role.equalsIgnoreCase("SWE"))
+return baseSalary + perfBonus;
+else if(role.equalsIgnoreCase("HR"))
+return baseSalary + perfBonus; // hiring commission treated as bonus
+else
+return baseSalary;
+}
+}
+// Another child class (Hierarchical inheritance)
+class ContractEmployee extends Employee {
+int noOfHrs;
+double hourlyRate;
+ContractEmployee(String name, String PANNo, String joiningDate, String designation,
+int empId, int noOfHrs, double hourlyRate) {
+super(name, PANNo, joiningDate, designation, empId);
+this.noOfHrs = noOfHrs;
+this.hourlyRate = hourlyRate;
+}
+@Override
+double calcCTC() {
+return noOfHrs * hourlyRate;
+}
+}
+// Multilevel inheritance
+class Manager extends FullTimeEmployee {
+double TA;
+double eduAllowance;
+Manager(String name, String PANNo, String joiningDate, String designation,
+int empId, String role, double baseSalary, double perfBonus,
+double TA, double eduAllowance) {
+super(name, PANNo, joiningDate, designation, empId, role, baseSalary, perfBonus);
+this.TA = TA;
+this.eduAllowance = eduAllowance;
+}
+@Override
+double calcCTC() {
+return baseSalary + perfBonus + TA + eduAllowance;
+}
+}
+// Main class
+public class PayrollSystem {
+public static void main(String[] args) {
+FullTimeEmployee emp1 = new FullTimeEmployee(
+"Rahul Sharma", "ABCDE1234F", "01-01-2022",
+"Software Engineer", 101, "SWE", 50000, 10000);
+ContractEmployee emp2 = new ContractEmployee(
+"Priya Verma", "PQRSX5678L", "05-02-2023",
+"Contract Developer", 102, 120, 400);
+Manager emp3 = new Manager(
+"Amit Singh", "LMNOP9876Z", "15-03-2021",
+"Project Manager", 103, "Manager", 70000, 15000, 5000, 3000);
+System.out.println("------ Full Time Employee ------");
+emp1.display();
+System.out.println("CTC: " + emp1.calcCTC());
+System.out.println("\n------ Contract Employee ------");
+emp2.display();
+System.out.println("CTC: " + emp2.calcCTC());
+System.out.println("\n------ Manager ------");
+emp3.display();
+System.out.println("CTC: " + emp3.calcCTC());
+}
+}
