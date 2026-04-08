@@ -1,0 +1,175 @@
+studentId,name,branch,marks1,marks2,marks3,marks4,marks5,percentage
+101,Rahul,CS,78,85,80,88,90,0
+102,Anita,IT,70,75,72,68,74,0
+
+import java.io.*;
+import java.util.*;
+
+class Student {
+    int studentId;
+    String name;
+    String branch;
+    int marks1, marks2, marks3, marks4, marks5;
+    double percentage;
+
+    Student(int id, String name, String branch, int m1, int m2, int m3, int m4, int m5) {
+        this.studentId = id;
+        this.name = name;
+        this.branch = branch;
+        this.marks1 = m1;
+        this.marks2 = m2;
+        this.marks3 = m3;
+        this.marks4 = m4;
+        this.marks5 = m5;
+        calculatePercentage();
+    }
+
+    void calculatePercentage() {
+        int total = marks1 + marks2 + marks3 + marks4 + marks5;
+        percentage = total / 5.0;
+    }
+
+    String toCSV() {
+        return studentId + "," + name + "," + branch + "," +
+                marks1 + "," + marks2 + "," + marks3 + "," +
+                marks4 + "," + marks5 + "," + percentage;
+    }
+}
+
+public class StudentsCSVCRUD {
+
+    static String fileName = "Students.csv";
+
+    public static void main(String[] args) {
+
+        try {
+
+            // ADD 3 new students (marks4 and marks5 = 0)
+            addStudent(new Student(103, "Karan", "CS", 65, 70, 68, 0, 0));
+            addStudent(new Student(104, "Meera", "IT", 82, 79, 85, 0, 0));
+            addStudent(new Student(105, "Rohit", "ENTC", 75, 80, 78, 0, 0));
+
+            System.out.println("\nAfter Adding Students:");
+            display();
+
+            // UPDATE marks
+            updateMarks(103, 72, 74);
+            updateMarks(104, 88, 90);
+            updateMarks(105, 81, 83);
+
+            System.out.println("\nAfter Updating Marks:");
+            display();
+
+            // DELETE row
+            deleteStudent(102);
+
+            System.out.println("\nAfter Deleting Student 102:");
+            display();
+
+        } catch (IOException e) {
+            System.out.println("IOException occurred: " + e.getMessage());
+        }
+    }
+
+    // ADD
+    static void addStudent(Student s) throws IOException {
+        FileWriter fw = new FileWriter(fileName, true);
+        fw.write("\n" + s.toCSV());
+        fw.close();
+        System.out.println("Student Added: " + s.name);
+    }
+
+    // DISPLAY
+    static void display() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            System.out.println(line);
+        }
+
+        br.close();
+    }
+
+    // UPDATE MARKS
+    static void updateMarks(int id, int m4, int m5) throws IOException {
+
+        File inputFile = new File(fileName);
+        File tempFile = new File("temp.csv");
+
+        BufferedReader br = new BufferedReader(new FileReader(inputFile));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile));
+
+        String line;
+
+        while ((line = br.readLine()) != null) {
+
+            if (line.startsWith("studentId")) {
+                bw.write(line);
+                bw.newLine();
+                continue;
+            }
+
+            String[] data = line.split(",");
+
+            if (Integer.parseInt(data[0]) == id) {
+
+                int m1 = Integer.parseInt(data[3]);
+                int m2 = Integer.parseInt(data[4]);
+                int m3 = Integer.parseInt(data[5]);
+
+                Student s = new Student(id, data[1], data[2], m1, m2, m3, m4, m5);
+
+                bw.write(s.toCSV());
+            } else {
+                bw.write(line);
+            }
+
+            bw.newLine();
+        }
+
+        br.close();
+        bw.close();
+
+        inputFile.delete();
+        tempFile.renameTo(inputFile);
+
+        System.out.println("Marks updated for studentId: " + id);
+    }
+
+    // DELETE
+    static void deleteStudent(int id) throws IOException {
+
+        File inputFile = new File(fileName);
+        File tempFile = new File("temp.csv");
+
+        BufferedReader br = new BufferedReader(new FileReader(inputFile));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile));
+
+        String line;
+
+        while ((line = br.readLine()) != null) {
+
+            if (line.startsWith("studentId")) {
+                bw.write(line);
+                bw.newLine();
+                continue;
+            }
+
+            String[] data = line.split(",");
+
+            if (Integer.parseInt(data[0]) != id) {
+                bw.write(line);
+                bw.newLine();
+            }
+        }
+
+        br.close();
+        bw.close();
+
+        inputFile.delete();
+        tempFile.renameTo(inputFile);
+
+        System.out.println("Student deleted with ID: " + id);
+    }
+}
