@@ -1,0 +1,104 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+// ─────────────────────────────────────────────
+// Product Interface
+// ─────────────────────────────────────────────
+interface Product {
+void displayDetails();
+}
+// ─────────────────────────────────────────────
+// LegacyItem – existing/legacy class
+// ─────────────────────────────────────────────
+class LegacyItem {
+private int itemId;
+private String description;
+// Parameterized constructor
+public LegacyItem(int itemId, String description) {
+this.itemId = itemId;
+this.description = description;
+}
+// Legacy print method
+public void print() {
+System.out.println("Legacy Item [ID: " + itemId + ", Description: " +
+description + "]");
+}
+}
+// ─────────────────────────────────────────────
+// Adapter Pattern – bridges LegacyItem → Product
+// ─────────────────────────────────────────────
+class ProductAdapter implements Product {
+private LegacyItem legacyItem;
+public ProductAdapter(LegacyItem legacyItem) {
+this.legacyItem = legacyItem;
+}
+@Override
+public void displayDetails() {
+legacyItem.print(); // delegates to legacy method
+}
+}
+// ─────────────────────────────────────────────
+// NewProduct – modern product implementation
+// ─────────────────────────────────────────────
+class NewProduct implements Product {
+private String name;
+public NewProduct(String name) {
+this.name = name;
+}
+@Override
+public void displayDetails() {
+System.out.println("New Product [Name: " + name + "]");
+}
+}
+// ─────────────────────────────────────────────
+// Singleton Pattern – single InventoryManager
+// ─────────────────────────────────────────────
+class InventoryManager {
+private static InventoryManager instance; private List<Product> inventory;
+// sole instance
+// Private constructor prevents external instantiation
+private InventoryManager() {
+inventory = new ArrayList<>();
+}
+// Global access point
+public static InventoryManager getInstance() {
+if (instance == null) {
+instance = new InventoryManager();
+}
+return instance;
+}
+// Add a product to the inventory
+public void addProduct(Product product) {
+inventory.add(product);
+}
+// Iterator Pattern – returns an iterator over the product list
+public Iterator<Product> returnInventory() {
+return inventory.iterator();
+}
+}
+// ─────────────────────────────────────────────
+// Main – driver class
+// ─────────────────────────────────────────────
+public class InventoryManagementSystem {
+public static void main(String[] args) {
+// Singleton: one shared InventoryManager instance
+InventoryManager manager = InventoryManager.getInstance();
+// Add NewProduct entries
+manager.addProduct(new NewProduct("Wireless Keyboard"));
+manager.addProduct(new NewProduct("USB-C Hub"));
+manager.addProduct(new NewProduct("Noise-Cancelling Headphones"));
+// Add legacy items via Adapter
+manager.addProduct(new ProductAdapter(new LegacyItem(101, "Vintage Desk
+Lamp")));
+manager.addProduct(new ProductAdapter(new LegacyItem(202, "Mechanical
+Typewriter")));
+// Iterator Pattern: traverse inventory and display each product
+System.out.println("========== Inventory ==========");
+Iterator<Product> iterator = manager.returnInventory();
+while (iterator.hasNext()) {
+Product product = iterator.next();
+product.displayDetails();
+}
+System.out.println("===============================");
+}
+}
